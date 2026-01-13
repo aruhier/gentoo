@@ -1,4 +1,4 @@
-# Copyright 2023-2025 Gentoo Authors
+# Copyright 2023-2026 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
 EAPI=8
@@ -20,13 +20,20 @@ fi
 
 LICENSE="BSD"
 SLOT="0/$(ver_cut 1-2)"
+IUSE="test"
+RESTRICT="!test? ( test )"
 
+BDEPEND="
+	test? ( dev-cpp/gtest )
+"
 DEPEND="
 	x11-libs/pixman
 "
 RDEPEND="${DEPEND}"
 
-PATCHES=(
-	# Merged upstream, not need in live
-	"${FILESDIR}/${PN}-fix-building-with-GCC16.patch"
-)
+src_configure() {
+    local mycmakeargs=(
+		-DBUILD_TESTING=$(usex test)
+    )
+    cmake_src_configure
+}
